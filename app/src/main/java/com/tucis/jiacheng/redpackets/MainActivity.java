@@ -20,19 +20,30 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import 	java.net.URL;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+import org.json.JSONObject;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
-
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 
 
 import static android.content.ContentValues.TAG;
+import static android.provider.ContactsContract.CommonDataKinds.Website.URL;
 import static java.net.Proxy.Type.HTTP;
 
 /**
@@ -48,7 +59,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private Button start;
     private Button end;
     private String MyId;
-    String address="10.0.0.67";
+    String address="69.249.186.83";
     int port=10002;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,7 +170,12 @@ public class MainActivity extends Activity implements View.OnClickListener{
             Log.d(TAG, "the newLocation is " + newLocation.getLongitude() + "x" + newLocation.getLatitude());
             String msg= MyId+" the newLocation is " + newLocation.getLongitude() + "x" + newLocation.getLatitude()+"\n";
             textbox.append("\nthe newLocation is " + newLocation.getLongitude() + "x" + newLocation.getLatitude());
-            new SocketRequest(address, port, msg).start();
+//            new SocketRequest(address, port, msg).start();
+            Map<String, String> params = new HashMap<String, String>();
+            params.put("longitude",  newLocation.getLongitude()+"");
+            params.put("latitude",  newLocation.getLatitude()+"");
+            params.put("ID",MyId);
+            new DoPostRequest(params, "utf-8").start();
             mValid = true;
         }
 
@@ -191,7 +207,44 @@ public class MainActivity extends Activity implements View.OnClickListener{
         }
     }
 
+    public void senddata(Map<String, String> params, String encode){
+        byte[] data = getRequestData(params, encode).toString().getBytes();
+        try {
+            URL url = new URL("http://10.0.0.67/");
+            HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
+            httpURLConnection.setConnectTimeout(3000);//设置连接超时时间
+            httpURLConnection.setDoInput(true);//打开输入流，以便从服务器获取数据
+            httpURLConnection.setDoOutput(true);//打开输出流，以便向服务器提交数据
+            httpURLConnection.setRequestMethod("POST");//设置以Post方式提交数据
+            httpURLConnection.setUseCaches(false);//使用Post方式不能使用缓存
+            httpURLConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            //设置请求体的长度
+            httpURLConnection.setRequestProperty("Content-Length", String.valueOf(data.length));
+            //获得输出流，向服务器写入数据
+            OutputStream outputStream = httpURLConnection.getOutputStream();
+            outputStream.write(data);
 
-
-
+            int response = httpURLConnection.getResponseCode();            //获得服务器的响应码
+            if(response == HttpURLConnection.HTTP_OK) {
+                InputStream inptStream = httpURLConnection.getInputStream();
+//                return dealResponseResult(inptStream);                     //处理服务器的响应结果
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+    public static StringBuffer getRequestData(Map<String, String> params, String encode) {
+        StringBuffer stringBuffer = new StringBuffer();        //存储封装好的请求体信息
+        try {
+                for(Map.Entry<String, String> entry : params.entrySet())
+                {
+                    stringBuffer.append(entry.getKey()).append("=").append(URLEncoder.encode(entry.getValue(), encode)).append("&");
+                }
+                stringBuffer.deleteCharAt(stringBuffer.length() - 1);    //删除最后的一个"&"
+        } catch (Exception e) {
+            e.printStackTrace();
+         }
+        return stringBuffer;
+    }
+
+}
