@@ -5,7 +5,9 @@
     //模糊定位权限：一般用于网络定位
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     //精确定位权限：一般用于gps定位
+
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"

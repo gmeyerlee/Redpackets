@@ -11,8 +11,10 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -42,23 +44,31 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private LocationManager mLocationManager;
     private Context context;
     private MyLocationListener listener;
-    TextView textbox;
-    Button start;
-    Button end;
+    private TextView textbox;
+    private Button start;
+    private Button end;
+    private String MyId;
+    String address="10.0.0.67";
+    int port=10002;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
         context=getApplicationContext();
-        this.textbox=(TextView)findViewById(R.id.output_text);
-        this.start=(Button)findViewById(R.id.start_service);
-        this.end=(Button)findViewById(R.id.stop_service);
+        textbox=(TextView)findViewById(R.id.output_text);
+        start=(Button)findViewById(R.id.start_service);
+        end=(Button)findViewById(R.id.stop_service);
+        if(start==null){
+            System.out.println("======================================================");
+        }
+
         start.setOnClickListener(this);
         end.setOnClickListener(this);
     }
     private void startreceiving(){
         mLocationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
         criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_HIGH);//设置定位精准度
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);//设置定位精准度
         criteria.setAltitudeRequired(false);//是否要求海拔
         criteria.setBearingRequired(true);//是否要求方向
         criteria.setCostAllowed(true);//是否要求收费
@@ -74,7 +84,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
         this.startRequestLocationUpdates();
     }
     public void startRequestLocationUpdates(){
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+            TelephonyManager tm = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE); MyId = tm.getDeviceId();
             mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000,  1f, listener);
         }
         else{
@@ -97,7 +108,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                     // No explanation needed, we can request the permission.
 
                     ActivityCompat.requestPermissions(this,
-                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.INTERNET},
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.INTERNET, Manifest.permission.READ_PHONE_STATE},
                             1);
 
                     // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
@@ -122,6 +133,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 this.startreceiving();
                 break;
             case R.id.stop_service:
+                stopRequestLocationUpdates();
                 break;
             default:
                 break;
@@ -142,9 +154,12 @@ public class MainActivity extends Activity implements View.OnClickListener{
             if (!mValid) {
                 Log.d(TAG, "Got first location.");
             }
-            mLastLocation.set(newLocation);
+
+            mLastLocation=new Location(newLocation);
             Log.d(TAG, "the newLocation is " + newLocation.getLongitude() + "x" + newLocation.getLatitude());
-            textbox.append("the newLocation is " + newLocation.getLongitude() + "x" + newLocation.getLatitude());
+            String msg= MyId+" the newLocation is " + newLocation.getLongitude() + "x" + newLocation.getLatitude()+"\n";
+            textbox.append("\nthe newLocation is " + newLocation.getLongitude() + "x" + newLocation.getLatitude());
+            new SocketRequest(address, port, msg).start();
             mValid = true;
         }
 
