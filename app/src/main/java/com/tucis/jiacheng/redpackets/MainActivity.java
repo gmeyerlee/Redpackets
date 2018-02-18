@@ -18,7 +18,20 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
+import java.io.IOException;
+import java.net.SocketTimeoutException;
+
+
+
 import static android.content.ContentValues.TAG;
+import static java.net.Proxy.Type.HTTP;
 
 /**
  * Created by Harrison on 2/14/18.
@@ -62,7 +75,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
     }
     public void startRequestLocationUpdates(){
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
-            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1f, listener);
+            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000,  1f, listener);
         }
         else{
             System.out.println("No permission");
@@ -115,6 +128,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         }
     }
     private class MyLocationListener implements LocationListener {
+
         Location mLastLocation;
         boolean mValid = false;
 
@@ -161,4 +175,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
             return mValid ? mLastLocation : null;
         }
     }
-}
+
+
+
+
+    }
