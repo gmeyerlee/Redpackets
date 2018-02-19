@@ -36,7 +36,6 @@ public class DoPostRequest extends Thread{
     }
     @Override
     public void run() {
-        System.out.println("**************************************");
         byte[] data = getRequestData(params, encode).toString().getBytes();
         try {
             HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
