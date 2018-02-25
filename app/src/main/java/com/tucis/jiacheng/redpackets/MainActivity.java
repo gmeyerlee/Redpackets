@@ -11,6 +11,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -20,6 +21,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import 	java.net.URL;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.params.HttpConnectionParams;
@@ -38,6 +42,8 @@ import java.net.SocketAddress;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,8 +64,9 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private TextView textbox;
     private Button start;
     private Button end;
-    private String MyId;
+    private String MyId="no id";
     String address="69.249.186.83";
+    private FileOutputStream myoutput=null;
     int port=10002;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,10 +148,22 @@ public class MainActivity extends Activity implements View.OnClickListener{
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.start_service:
+                String filename=getsensorFilename();
+                try{
+                    myoutput=new FileOutputStream(filename,true);
+                }catch(FileNotFoundException e){
+                    e.printStackTrace();
+                }
                 this.startreceiving();
+
                 break;
             case R.id.stop_service:
                 stopRequestLocationUpdates();
+                try {
+                    myoutput.close();
+                }catch(IOException e){
+                    e.getStackTrace();
+                }
                 break;
             default:
                 break;
@@ -167,7 +186,13 @@ public class MainActivity extends Activity implements View.OnClickListener{
             }
 
             mLastLocation=new Location(newLocation);
-
+            String message=newLocation.getTime()+" "+newLocation.getLongitude()+" "+newLocation.getLatitude()+" "+MyId+"\n";
+            try {
+                myoutput.write(message.getBytes());
+                myoutput.flush();
+            }catch(IOException e){
+                e.getStackTrace();
+            }
             Log.d(TAG, "the newLocation is " + newLocation.getLongitude() + "x" + newLocation.getLatitude());
             String msg= MyId+" the newLocation is " + newLocation.getLongitude() + "x" + newLocation.getLatitude()+"\n";
             textbox.append("\nthe newLocation is " + newLocation.getLongitude() + "x" + newLocation.getLatitude());
@@ -246,6 +271,17 @@ public class MainActivity extends Activity implements View.OnClickListener{
             e.printStackTrace();
          }
         return stringBuffer;
+    }
+    private String getsensorFilename(){
+        String filepath= Environment.getExternalStorageDirectory().getParent();
+        File path=getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+        File file=new File(path.getAbsolutePath(),"gps");
+        if(!file.exists()){
+            file.mkdirs();
+        }
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMdd_HHmmss");
+        String currentDateandTime=sdf.format(new Date());
+        return (file.getAbsolutePath()+"/"+currentDateandTime+".txt");
     }
 
 }
