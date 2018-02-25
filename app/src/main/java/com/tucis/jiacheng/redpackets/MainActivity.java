@@ -59,7 +59,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private Button start;
     private Button end;
     private String MyId;
-    String address="69.249.186.83";
+    String address="96.126.120.53";
     int port=10002;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
