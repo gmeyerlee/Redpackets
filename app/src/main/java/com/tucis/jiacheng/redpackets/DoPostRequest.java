@@ -17,7 +17,7 @@ import java.util.Map;
 public class DoPostRequest extends Thread{
     private Map<String, String> params;
     private String encode;
-    private static final String URL_PATH = "http://10.0.0.67:8080/MyServer/MyServer";
+    private static final String URL_PATH = "http://96.126.120.53:8080/MyServer/MyServer";
     private static URL url;
 
 
@@ -49,14 +49,15 @@ public class DoPostRequest extends Thread{
             httpURLConnection.setRequestProperty("Content-Length", String.valueOf(data.length));
             //获得输出流，向服务器写入数据
             OutputStream outputStream = httpURLConnection.getOutputStream();
-            System.out.println(data);
             outputStream.write(data);
 
             int response = httpURLConnection.getResponseCode();            //获得服务器的响应码
+            System.out.println(response+"");
+
             if(response == HttpURLConnection.HTTP_OK) {
                 InputStream inptStream = httpURLConnection.getInputStream();
 
-                System.out.println( dealResponseResult(inptStream).length());                     //处理服务器的响应结果
+                System.out.println( "The length of data is : "+ dealResponseResult(inptStream).length());                     //处理服务器的响应结果
             }
         } catch (IOException e) {
             System.out.println("Exception!!!!!!!!!!!!!!!!!!!!!!");

@@ -167,6 +167,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
             }
 
             mLastLocation=new Location(newLocation);
+
             Log.d(TAG, "the newLocation is " + newLocation.getLongitude() + "x" + newLocation.getLatitude());
             String msg= MyId+" the newLocation is " + newLocation.getLongitude() + "x" + newLocation.getLatitude()+"\n";
             textbox.append("\nthe newLocation is " + newLocation.getLongitude() + "x" + newLocation.getLatitude());
