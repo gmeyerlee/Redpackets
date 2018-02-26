@@ -56,8 +56,8 @@ public class DoPostRequest extends Thread{
 
             if(response == HttpURLConnection.HTTP_OK) {
                 InputStream inptStream = httpURLConnection.getInputStream();
-
-                System.out.println( "The length of data is : "+ dealResponseResult(inptStream).length());                     //处理服务器的响应结果
+                String myreply=dealResponseResult(inptStream);
+                System.out.println( "The length of data is : "+ myreply.length());                     //处理服务器的响应结果
             }
         } catch (IOException e) {
             System.out.println("Exception!!!!!!!!!!!!!!!!!!!!!!");

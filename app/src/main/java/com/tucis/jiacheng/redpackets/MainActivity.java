@@ -61,6 +61,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private LocationManager mLocationManager;
     private Context context;
     private MyLocationListener listener;
+    private MyLocationListener listeners[]={new MyLocationListener(), new MyLocationListener()};
     private TextView textbox;
     private Button start;
     private Button end;
@@ -102,9 +103,11 @@ public class MainActivity extends Activity implements View.OnClickListener{
         this.startRequestLocationUpdates();
     }
     public void startRequestLocationUpdates(){
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
             TelephonyManager tm = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE); MyId = tm.getDeviceId();
-            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000,  1f, listener);
+            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0,  0f, listeners[0]);
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,  0f, listeners[1]);
         }
         else{
             System.out.println("No permission");
@@ -139,11 +142,29 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     //停止地理位置更新
     public void stopRequestLocationUpdates(){
-        mLocationManager.removeUpdates(listener);
+        mLocationManager.removeUpdates(listeners[0]);mLocationManager.removeUpdates(listeners[1]);
     }
 
     public Location getCurrentLocation() {
-        return listener.current();
+        // go in best to worst order
+        Location l1=listeners[0].current();
+        Location l2=listeners[1].current();
+        if(l1==null && l2!=null){
+            return l2;
+        }
+        if(l2==null && l1!=null){
+            return l1;
+        }
+        if(l1!=null&&l2!=null){
+            if(l1.getAccuracy()<l2.getAccuracy()){
+                return l1;
+            }
+            else{
+                return l2;
+            }
+        }
+        return null;
+
     }
     public void onClick(View v) {
         switch (v.getId()) {
@@ -181,10 +202,14 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 // Hack to filter out 0.0,0.0 locations
                 return;
             }
+            if(newLocation.getAccuracy()>30){
+                return;
+            }
             if (!mValid) {
                 Log.d(TAG, "Got first location.");
             }
 
+            System.out.println("#################   "+newLocation.getAccuracy());
             mLastLocation=new Location(newLocation);
             String message=newLocation.getTime()+" "+newLocation.getLongitude()+" "+newLocation.getLatitude()+" "+MyId+"\n";
             try {
@@ -193,8 +218,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
             }catch(IOException e){
                 e.getStackTrace();
             }
-            Log.d(TAG, "the newLocation is " + newLocation.getLongitude() + "x" + newLocation.getLatitude());
-            String msg= MyId+" the newLocation is " + newLocation.getLongitude() + "x" + newLocation.getLatitude()+"\n";
+//            Log.d(TAG, "the newLocation is " + newLocation.getLongitude() + "x" + newLocation.getLatitude());
+//            String msg= MyId+" the newLocation is " + newLocation.getLongitude() + "x" + newLocation.getLatitude()+"\n";
             textbox.append("\nthe newLocation is " + newLocation.getLongitude() + "x" + newLocation.getLatitude());
 //            new SocketRequest(address, port, msg).start();
             Map<String, String> params = new HashMap<String, String>();
