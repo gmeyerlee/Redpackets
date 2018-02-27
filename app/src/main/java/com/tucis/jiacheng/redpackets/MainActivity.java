@@ -106,8 +106,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
             TelephonyManager tm = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE); MyId = tm.getDeviceId();
-            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0,  0f, listeners[0]);
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,  0f, listeners[1]);
+            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1,  0f, listeners[0]);
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1,  0f, listeners[1]);
         }
         else{
             System.out.println("No permission");
@@ -202,7 +202,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 // Hack to filter out 0.0,0.0 locations
                 return;
             }
-            if(newLocation.getAccuracy()>30){
+            if(newLocation.getAccuracy()>20){
                 return;
             }
             if (!mValid) {
@@ -220,7 +220,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
             }
 //            Log.d(TAG, "the newLocation is " + newLocation.getLongitude() + "x" + newLocation.getLatitude());
 //            String msg= MyId+" the newLocation is " + newLocation.getLongitude() + "x" + newLocation.getLatitude()+"\n";
-            textbox.append("\nthe newLocation is " + newLocation.getLongitude() + "x" + newLocation.getLatitude());
+            textbox.append("\nthe newLocation is found " + newLocation.getAccuracy());
 //            new SocketRequest(address, port, msg).start();
             Map<String, String> params = new HashMap<String, String>();
             params.put("longitude",  newLocation.getLongitude()+"");
