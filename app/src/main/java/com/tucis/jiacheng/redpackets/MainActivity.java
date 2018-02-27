@@ -106,7 +106,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
             TelephonyManager tm = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE); MyId = tm.getDeviceId();
-            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1,  0f, listeners[0]);
+//            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1,  0f, listeners[0]);
             mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1,  0f, listeners[1]);
         }
         else{
@@ -142,28 +142,30 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     //停止地理位置更新
     public void stopRequestLocationUpdates(){
-        mLocationManager.removeUpdates(listeners[0]);mLocationManager.removeUpdates(listeners[1]);
+//        mLocationManager.removeUpdates(listeners[0]);
+mLocationManager.removeUpdates(listeners[1]);
     }
 
     public Location getCurrentLocation() {
         // go in best to worst order
-        Location l1=listeners[0].current();
-        Location l2=listeners[1].current();
-        if(l1==null && l2!=null){
-            return l2;
-        }
-        if(l2==null && l1!=null){
-            return l1;
-        }
-        if(l1!=null&&l2!=null){
-            if(l1.getAccuracy()<l2.getAccuracy()){
-                return l1;
-            }
-            else{
-                return l2;
-            }
-        }
-        return null;
+//        Location l1=listeners[0].current();
+//        Location l2=listeners[1].current();
+//        if(l1==null && l2!=null){
+//            return l2;
+//        }
+//        if(l2==null && l1!=null){
+//            return l1;
+//        }
+//        if(l1!=null&&l2!=null){
+//            if(l1.getAccuracy()<l2.getAccuracy()){
+//                return l1;
+//            }
+//            else{
+//                return l2;
+//            }
+//        }
+//        return null;
+        return listeners[1].current();
 
     }
     public void onClick(View v) {
@@ -202,7 +204,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 // Hack to filter out 0.0,0.0 locations
                 return;
             }
-            if(newLocation.getAccuracy()>20){
+            if(newLocation.getAccuracy()>10){
                 return;
             }
             if (!mValid) {
