@@ -174,6 +174,7 @@ mLocationManager.removeUpdates(listeners[1]);
                 String filename=getsensorFilename();
                 try{
                     myoutput=new FileOutputStream(filename,true);
+                    textbox.setText("already start");
                 }catch(FileNotFoundException e){
                     e.printStackTrace();
                 }
@@ -181,6 +182,7 @@ mLocationManager.removeUpdates(listeners[1]);
 
                 break;
             case R.id.stop_service:
+                textbox.setText("already stop");
                 stopRequestLocationUpdates();
                 try {
                     myoutput.close();
@@ -204,7 +206,7 @@ mLocationManager.removeUpdates(listeners[1]);
                 // Hack to filter out 0.0,0.0 locations
                 return;
             }
-            if(newLocation.getAccuracy()>10){
+            if(newLocation.getAccuracy()>8){
                 return;
             }
             if (!mValid) {
@@ -222,7 +224,7 @@ mLocationManager.removeUpdates(listeners[1]);
             }
 //            Log.d(TAG, "the newLocation is " + newLocation.getLongitude() + "x" + newLocation.getLatitude());
 //            String msg= MyId+" the newLocation is " + newLocation.getLongitude() + "x" + newLocation.getLatitude()+"\n";
-            textbox.append("\nthe newLocation is found " + newLocation.getAccuracy());
+            textbox.setText("\nthe newLocation is found " + newLocation.getAccuracy());
 //            new SocketRequest(address, port, msg).start();
             Map<String, String> params = new HashMap<String, String>();
             params.put("longitude",  newLocation.getLongitude()+"");
