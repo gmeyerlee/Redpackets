@@ -1,0 +1,24 @@
+[
+    {
+        "category_name": "Browsing Pois",
+        "samples": [
+            {
+                "required_extensions": [
+                    "native_detail",
+                    "screenshot",
+                    "geo"
+                ],
+                "name": "Bonus: Capture Screen",
+                "path": "10_BrowsingPois_6_Bonus-CaptureScreen/index.html",
+                "requiredFeatures": [
+                    "geo",
+                    "photo_library_screenshot_import"
+                ],
+                "startupConfiguration": {
+                    "camera_resolution": "auto",
+                    "camera_position": "back"
+                }
+            }
+        ]
+    }
+]

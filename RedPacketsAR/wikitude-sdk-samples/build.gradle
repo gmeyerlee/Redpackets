@@ -1,0 +1,65 @@
+apply plugin: 'com.android.application'
+
+android {
+
+    compileSdkVersion 26
+    buildToolsVersion commonBuildToolsVersion
+
+    defaultConfig {
+        applicationId "com.wikitude.sdksamples"
+        minSdkVersion 19
+        targetSdkVersion 26
+        versionName "7.2.1"
+        versionCode 7210
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            debuggable true
+        }
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.each  { output ->
+            def outputFile = output.outputFile
+            if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                def fileName = "wikitude-sdk-samples-" + variant.buildType.name + ".apk"
+                output.outputFileName = new File(outputFile.parent, fileName)
+            }
+        }
+    }
+
+    flavorDimensions "arch"
+
+    productFlavors {
+        arm7 {
+            dimension "arch"
+        }
+        arm8 {
+            dimension "arch"
+        }
+        x86 {
+            dimension "arch"
+        }
+        allarchs {
+            dimension "arch"
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile(name: 'wikitudesdk', ext: 'aar')
+    compile "com.android.support:appcompat-v7:$commonSupportLibVersion"
+    compile "com.android.support:design:$commonSupportLibVersion"
+    compile "com.android.support:support-v4:$commonSupportLibVersion"
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+}
+
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
